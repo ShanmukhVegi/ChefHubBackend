@@ -4,4 +4,5 @@ django_heroku==0.0.0
 djangorestframework==3.13.1
 firebase_admin==5.2.0
 PyJWT==2.3.0
-django-cors-headers
+psycopg2-binary==2.9.1
+django-cors-headers==3.11.0
