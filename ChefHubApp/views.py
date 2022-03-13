@@ -28,10 +28,12 @@ firebase_admin.initialize_app(cred,{'storageBucket': 'chefhub-8bb79.appspot.com'
 db = firestore.client()
 bucket = storage.bucket()
 
-key = b'UysF9LLktZez86mfmvClB8nVr6PxuW0TeDyVjpBHJbw='
-cipher_suite = Fernet(key)
+#PASS_ENC_DEC_KEY = "UysF9LLktZez86mfmvClB8nVr6PxuW0TeDyVjpBHJbw="
+PASS_ENC_DEC_KEY = bytes(os.environ.get("SECRET_KEY_JWT"),'UTF-8')
+cipher_suite = Fernet(ENCRYPTION_KEY)
 
-secret_key_jwt = "ChefHub@123$"
+#SECRET_KEY_JWT = "ChefHub@123$"
+SECRET_KEY_JWT = os.environ.get("SECRET_KEY_JWT")
 
 
 @api_view(['POST'])
@@ -43,12 +45,14 @@ def signup(request):
             data=data.dict()
         name = data['name']
         mobileNumber = data['mobilenumber']
-        password = cipher_suite.encrypt(bytes(data['password'],'utf-8'))
+        password = cipher_suite.encrypt(bytes(data['password'],'UTF-8'))
         user_type = data['type']
         try :
-            checkdata = db.collection('Login').document(mobileNumber)
-            if checkdata:
+            checkdata = db.collection('Login').document(mobileNumber).get()
+            data_dict = checkdata.to_dict()
+            if data_dict:
                 return JsonResponse({'success':False,'message':'user exists'})
+            data['password'] = password
             db.collection('Users').document(mobileNumber).set(data)
             db.collection('Login').document(mobileNumber).set({"name":name,"password" : password, "type":user_type})
         except:
@@ -75,5 +79,5 @@ def login(request):
         decoded_password = cipher_suite.decrypt(encoded_password).decode("UTF-8")
         if decoded_password != password :
             return JsonResponse({'success':False,'message':'Invalid Password'})
-        encoded_jwt = jwt.encode({"mobilenumber":mobileNumber,"password": encoded_password.decode(),'datetime':str(datetime.datetime.now())}, secret_key_jwt, algorithm="HS256")
+        encoded_jwt = jwt.encode({"mobilenumber":mobileNumber,"password": encoded_password.decode(),'datetime':str(datetime.datetime.now())}, SECRET_KEY_JWT, algorithm="HS256")
         return JsonResponse({'success':True,'message':'Success','token':encoded_jwt})
