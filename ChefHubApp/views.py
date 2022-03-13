@@ -20,7 +20,7 @@ import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
-cred = credentials.Certificate("/Users/shanmukhvegi/Desktop/chefhub-firebase.json")
+cred = credentials.Certificate("chefhub-firebase.json")
 firebase_admin.initialize_app(cred,{'storageBucket': 'chefhub-8bb79.appspot.com'})
 
 
