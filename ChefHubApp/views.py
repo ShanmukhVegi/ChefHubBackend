@@ -30,7 +30,7 @@ bucket = storage.bucket()
 
 #PASS_ENC_DEC_KEY = "UysF9LLktZez86mfmvClB8nVr6PxuW0TeDyVjpBHJbw="
 PASS_ENC_DEC_KEY = bytes(os.environ.get("SECRET_KEY_JWT"),'UTF-8')
-cipher_suite = Fernet(ENCRYPTION_KEY)
+cipher_suite = Fernet(PASS_ENC_DEC_KEY)
 
 #SECRET_KEY_JWT = "ChefHub@123$"
 SECRET_KEY_JWT = os.environ.get("SECRET_KEY_JWT")
