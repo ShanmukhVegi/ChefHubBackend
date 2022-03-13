@@ -1,4 +1,5 @@
-release: python3 manage.py makemigrations --no-input
-release: python3 manage.py migrate --no-input
-
 web: gunicorn ChefHubRestApi.wsgi
+
+release: python manage.py makemigrations --noinput
+release: python manage.py collectstatic --noinput
+release: python manage.py migrate --noinput
