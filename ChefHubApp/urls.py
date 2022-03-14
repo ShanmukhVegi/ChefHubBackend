@@ -3,5 +3,6 @@ from ChefHubApp import views
  
 urlpatterns = [ 
     url(r'^signup', views.signup),
-    url(r'^login',views.login)
+    url(r'^login',views.login),
+    url(r'^generateotp',transactions.requestotp)
 ]

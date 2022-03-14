@@ -37,6 +37,11 @@ cipher_suite = Fernet(PASS_ENC_DEC_KEY)
 SECRET_KEY_JWT = os.environ.get("SECRET_KEY_JWT")
 
 
+'''
+Function : signup
+Methods : Post
+Description: adds data to Users and Login table of firebase with encrypted passwords
+'''
 @api_view(['POST'])
 def signup(request):
 
@@ -62,7 +67,11 @@ def signup(request):
 
 
 
-
+'''
+Function : login
+Methods : GET
+Description: checks the data in the firebase and return a response with jwt-token if valid user 
+'''
 @api_view(['GET'])
 def login(request):
     
