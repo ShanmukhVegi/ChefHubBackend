@@ -17,8 +17,7 @@ def requestotp(request):
             payload = "sender_id=ChefHub&message={}&language=english&route=p&numbers={}"
             OTP = str(random.randint(100001, 999999))
             message = "Welcome to ChefHub, Your OTP is : "+OTP
-            payload.format(message,mobileNumber)
-            print(payload)
+            payload=payload.format(message,mobileNumber)
             headers = {
             #'authorization': "gNHOw26kaWRV4QEyrGB9xcYnquhfTj18Lt3DbFU0d5oizCKISlJCU9qaShMyAB3cPIvmfQO8XoRdZEFs",
             'authorization': os.environ.get("FAST2SMS_AUTHORIZATION_KEY"),
