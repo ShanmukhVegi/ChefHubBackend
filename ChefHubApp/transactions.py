@@ -20,7 +20,7 @@ def requestotp(request):
             payload.format(message,mobileNumber)
             headers = {
             #'authorization': "gNHOw26kaWRV4QEyrGB9xcYnquhfTj18Lt3DbFU0d5oizCKISlJCU9qaShMyAB3cPIvmfQO8XoRdZEFs",
-            'authorization': os.environ.get("FAST2SMS_AUTHORIZATION_KEY")
+            'authorization': os.environ.get("FAST2SMS_AUTHORIZATION_KEY"),
             'Content-Type': "application/x-www-form-urlencoded",
             'Cache-Control': "no-cache",
             }
