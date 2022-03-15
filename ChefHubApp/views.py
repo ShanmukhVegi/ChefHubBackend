@@ -20,14 +20,14 @@ if not firebase_admin._apps:
         "type": "service_account",
         "project_id": "chefhub-8bb79",
         "private_key_id": os.environ.get("FIREBASE_PRIVATE_KEY_ID"),
-        "private_key" : os.environ.get("FIREBASE_PRIVATE_KEY"),
+        "private_key": os.environ.get("FIREBASE_PRIVATE_KEY"),
         "client_email": "firebase-adminsdk-zyic1@chefhub-8bb79.iam.gserviceaccount.com",
         "client_id": "104554908566712336845",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
         "token_uri": "https://oauth2.googleapis.com/token",
         "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zyic1%40chefhub-8bb79.iam.gserviceaccount.com"
-        }
+    }
     cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred,{'storageBucket': 'chefhub-8bb79.appspot.com'})
 
@@ -60,7 +60,7 @@ def signup(request):
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
-        data['mobilenumber'] = int(data['mobilenumber'])
+        data['mobilenumber'] = str(data['mobilenumber'])
         name = data['name']
         mobileNumber = data['mobilenumber']
         encrypted_password = cipher_suite.encrypt(bytes(data['password'],'UTF-8'))
@@ -94,7 +94,7 @@ def login(request):
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
-        data['mobilenumber'] = int(data['mobilenumber'])
+        data['mobilenumber'] = str(data['mobilenumber'])
         mobileNumber = data['mobilenumber']
         password = data['password']
         try :
@@ -126,7 +126,7 @@ def generateOtp(request):
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
-        data['mobilenumber'] = int(data['mobilenumber'])
+        data['mobilenumber'] = str(data['mobilenumber'])
         mobileNumber = data['mobilenumber']
         try :
             url = "https://www.fast2sms.com/dev/bulk"
