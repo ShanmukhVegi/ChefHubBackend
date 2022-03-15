@@ -72,7 +72,6 @@ def signup(request):
                 return JsonResponse({'success':False,'message':'user exists'})
             db.collection('Login').document(mobileNumber).set({"name":name,"password" : encrypted_password, "type":user_type})
             del data['password']
-            del data['mobilenumber']
             if user_type == "User":
                 db.collection('Users').document(mobileNumber).set(data)
             else:
@@ -96,6 +95,7 @@ def login(request):
         if(type(data)!=dict):
             data=data.dict()
         data['mobilenumber'] = str(data['mobilenumber'])
+        mobileNumber = data['mobilenumber']
         password = data['password']
         try :
             result = db.collection("Login").document(mobileNumber).get()
