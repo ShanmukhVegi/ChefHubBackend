@@ -155,6 +155,7 @@ def getChefs(request):
             chefs= []
             for chef in res:
                 chefs.append(chef.to_dict())
+                del chefs[-1]['password']
             isEnd = True if len(chefs)<6 else False
             data = {
                 'chefs':chefs,
