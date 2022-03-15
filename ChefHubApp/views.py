@@ -16,7 +16,19 @@ from firebase_admin import credentials, firestore, storage
 
 #APP INITIALIZE
 if not firebase_admin._apps:
-    cred = credentials.Certificate(os.path.abspath("chefhub-firebase.json"))
+    cred_dict = {
+        "type": "service_account",
+        "project_id": "chefhub-8bb79",
+        "private_key_id": os.environ.get("FIREBASE_PRIVATE_KEY_ID")
+        "private_key" : os.environ.get("FIREBASE_PRIVATE_KEY")
+        "client_email": "firebase-adminsdk-zyic1@chefhub-8bb79.iam.gserviceaccount.com",
+        "client_id": "104554908566712336845",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zyic1%40chefhub-8bb79.iam.gserviceaccount.com"
+        }
+    cred = credentials.Certificate(cred_dict)
     firebase_admin.initialize_app(cred,{'storageBucket': 'chefhub-8bb79.appspot.com'})
 
 
@@ -162,4 +174,6 @@ def getChefs(request):
             return JsonResponse({'success':True,'message':'Fetched chefs data','data':data})
         except:
             return JsonResponse({'success':False,'message':"database error"})
+
+
             
