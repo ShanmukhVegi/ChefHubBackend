@@ -103,7 +103,7 @@ def login(request):
 
 
 '''
-Function : requestotp
+Function : generateOtp
 Methods : GET
 Description: sends a 6-digit message to the mobilenumber and responds with otp 
 '''
