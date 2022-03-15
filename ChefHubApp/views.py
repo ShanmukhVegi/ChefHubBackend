@@ -108,7 +108,7 @@ Methods : GET
 Description: sends a 6-digit message to the mobilenumber and responds with otp 
 '''
 @api_view(['GET'])
-def requestOtp(request):
+def generateOtp(request):
 
     if request.method == 'GET':
         data = request.data
@@ -148,6 +148,7 @@ def getChefs(request):
         if(type(data)!=dict):
             data=data.dict()
         token = data['token']
+        #Need to validate token
         startafter = int(data['start'])
         try:
             res = db.collection("Users").order_by("mobilenumber").start_after({'mobilenumber':startafter}).limit(6).get()
