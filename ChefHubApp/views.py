@@ -161,7 +161,7 @@ def getChefs(request):
                 'isEnd':isEnd
             }
             print(data)
-            return JsonResponse({'success':True,'message':'Fetched chefs data','data':data})
+            return JsonResponse({'success':True,'message':'Fetched chefs data','data':chefs})
         except:
             return JsonResponse({'success':False,'message':"database error"})
             
