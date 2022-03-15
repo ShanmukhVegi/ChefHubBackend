@@ -156,13 +156,11 @@ def getChefs(request):
             for chef in res:
                 chefs.append(chef.to_dict())
                 del chefs[-1]['password']
-            isEnd = True if len(chefs)<6 else False
             data = {
                 'chefs':chefs,
-                'isEnd':isEnd
+                'isEnd':True if len(chefs)<6 else False
             }
-            print(data)
-            return JsonResponse({'success':True,'message':'Fetched chefs data','data':chefs})
+            return JsonResponse({'success':True,'message':'Fetched chefs data','data':data})
         except:
             return JsonResponse({'success':False,'message':"database error"})
             
