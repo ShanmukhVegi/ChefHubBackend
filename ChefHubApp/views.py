@@ -151,11 +151,10 @@ def getChefs(request):
         #Need to validate token
         startafter = int(data['start'])
         try:
-            res = db.collection("Users").order_by("mobilenumber").start_after({'mobilenumber':startafter}).limit(6).get()
+            res = db.collection("Chefs").order_by("mobilenumber").start_after({'mobilenumber':startafter}).limit(6).get()
             chefs= []
             for chef in res:
                 chefs.append(chef.to_dict())
-                del chefs[-1]['password']
             data = {
                 'chefs':chefs,
                 'isEnd':True if len(chefs)<6 else False
