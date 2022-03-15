@@ -19,8 +19,8 @@ if not firebase_admin._apps:
     cred_dict = {
         "type": "service_account",
         "project_id": "chefhub-8bb79",
-        "private_key_id": os.environ.get("FIREBASE_PRIVATE_KEY_ID")
-        "private_key" : os.environ.get("FIREBASE_PRIVATE_KEY")
+        "private_key_id": os.environ.get("FIREBASE_PRIVATE_KEY_ID"),
+        "private_key" : os.environ.get("FIREBASE_PRIVATE_KEY"),
         "client_email": "firebase-adminsdk-zyic1@chefhub-8bb79.iam.gserviceaccount.com",
         "client_id": "104554908566712336845",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
