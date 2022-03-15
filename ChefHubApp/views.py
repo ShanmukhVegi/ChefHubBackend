@@ -1,43 +1,38 @@
+#IMPORTS
 from django.shortcuts import render
-
 from django.http.response import JsonResponse
-
 from rest_framework.decorators import api_view
 from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-from django.conf import settings
-
-
 import os
 import io
-from io import BytesIO
-
 from cryptography.fernet import Fernet
 import jwt
 import datetime
-
 import requests
 import random
-
-
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 
 
+#APP INITIALIZE
 if not firebase_admin._apps:
     cred = credentials.Certificate(os.path.abspath("chefhub-firebase.json"))
     firebase_admin.initialize_app(cred,{'storageBucket': 'chefhub-8bb79.appspot.com'})
 
 
-
+#DATA-BASE
 db = firestore.client()
+
+#DATA-BUCKET
 bucket = storage.bucket()
 
-
+#PASSWORD-ENCRYPTION-DECRYPTION-KEY
 PASS_ENC_DEC_KEY = bytes(os.environ.get("PASS_ENC_DEC_KEY"),'UTF-8')
 
+#CIPHER SUITE TO ENCRYPT AND DECRYPT PASSWORD
 cipher_suite = Fernet(PASS_ENC_DEC_KEY)
 
+#SECRET KEY TO GENERATE JWT
 SECRET_KEY_JWT = os.environ.get("SECRET_KEY_JWT")
 
 
@@ -53,21 +48,25 @@ def signup(request):
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
+        data['mobilenumber'] = int(data['mobilenumber'])
         name = data['name']
         mobileNumber = data['mobilenumber']
-        password = cipher_suite.encrypt(bytes(data['password'],'UTF-8'))
+        encrypted_password = cipher_suite.encrypt(bytes(data['password'],'UTF-8'))
         user_type = data['type']
         try :
             checkdata = db.collection('Login').document(mobileNumber).get()
             data_dict = checkdata.to_dict()
             if data_dict:
                 return JsonResponse({'success':False,'message':'user exists'})
-            data['password'] = password
-            db.collection('Users').document(mobileNumber).set(data)
-            db.collection('Login').document(mobileNumber).set({"name":name,"password" : password, "type":user_type})
+            db.collection('Login').document(mobileNumber).set({"name":name,"password" : encrypted_password, "type":user_type})
+            del data['password']
+            if user_type == "User":
+                db.collection('Users').document(mobileNumber).set(data)
+            else:
+                db.collection('Chefs').document(mobileNumber).set(data)
+            return JsonResponse({'success':True,'message':'successfully added'})
         except:
             return JsonResponse({'success':False, 'message':'Adding Failure'})
-        return JsonResponse({'success':True,'message':'successfully added'})
 
 
 
@@ -83,19 +82,23 @@ def login(request):
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
+        data['mobilenumber'] = int(data['mobilenumber'])
         mobileNumber = data['mobilenumber']
         password = data['password']
-        result = db.collection("Login").document(mobileNumber).get()
-        dictionary = result.to_dict()
-        if dictionary == None:
-            return JsonResponse({'success':False,'message':"Invalid User"})
-        encoded_password = dictionary['password']
-        decoded_password = cipher_suite.decrypt(encoded_password).decode("UTF-8")
-        if decoded_password != password :
-            return JsonResponse({'success':False,'message':'Invalid Password'})
-        encoded_jwt = jwt.encode({"mobilenumber":mobileNumber,"password": encoded_password.decode(),'datetime':str(datetime.datetime.now())}, SECRET_KEY_JWT, algorithm="HS256")
-        return JsonResponse({'success':True,'message':'Success','token':encoded_jwt})
-
+        try :
+            result = db.collection("Login").document(mobileNumber).get()
+            dictionary = result.to_dict()
+            if dictionary == None:
+                return JsonResponse({'success':False,'message':"Invalid User"})
+            encoded_password = dictionary['password']
+            decoded_password = cipher_suite.decrypt(encoded_password).decode("UTF-8")
+            if decoded_password != password :
+                return JsonResponse({'success':False,'message':'Invalid Password'})
+            user_type = dictionary['type']
+            encoded_jwt = jwt.encode({"mobilenumber":mobileNumber,'datetime':str(datetime.datetime.now()),'type':user_type}, SECRET_KEY_JWT, algorithm="HS256")
+            return JsonResponse({'success':True,'message':'Success','token':encoded_jwt,'type':user_type})
+        except:
+            return JsonResponse({'success':False,'message':"database error"})
 
 
 
@@ -105,12 +108,13 @@ Methods : GET
 Description: sends a 6-digit message to the mobilenumber and responds with otp 
 '''
 @api_view(['GET'])
-def requestotp(request):
+def requestOtp(request):
 
     if request.method == 'GET':
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
+        data['mobilenumber'] = int(data['mobilenumber'])
         mobileNumber = data['mobilenumber']
         try :
             url = "https://www.fast2sms.com/dev/bulk"
@@ -118,13 +122,43 @@ def requestotp(request):
             OTP = str(random.randint(100001, 999999))
             message = "Welcome to ChefHub, Your OTP is : "+OTP
             payload=payload.format(message,mobileNumber)
-            print(payload)
             headers = {
             'authorization': os.environ.get("FAST2SMS_AUTHORIZATION_KEY"),
             'Content-Type': "application/x-www-form-urlencoded",
             'Cache-Control': "no-cache",
             }
             response = requests.request("POST", url, data=payload, headers=headers)
+            return JsonResponse({'success':True,'message':'otp sent','OTP':OTP})
         except:
             return JsonResponse({'success':False, 'message':'Message Sending Failure'})
-        return JsonResponse({'success':True,'message':'otp sent','OTP':OTP})
+        
+
+
+
+'''
+Function : getChefs
+Methods : GET
+Description: returns details of 6 chefs
+'''
+@api_view(['GET'])
+def getChefs(request):
+
+    if request.method == 'GET':
+        data = request.data
+        if(type(data)!=dict):
+            data=data.dict()
+        token = data['token']
+        startafter = int(data['start'])
+        try:
+            res = db.collection("Users").order_by("mobilenumber").start_after({'mobilenumber':startafter}).limit(6).get()
+            chefs= []
+            for chef in res:
+                chefs.append(chef.to_dict())
+            data = {
+                'chefs':chefs,
+                'isEnd':True if len(chefs)<6 else False
+            }
+            return JsonResponse({'success':True,'message':'Fetched chefs data','data':data})
+        except:
+            return JsonResponse({'success':False,'message':"database error"})
+            
