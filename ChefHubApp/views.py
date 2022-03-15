@@ -96,7 +96,6 @@ def login(request):
         if(type(data)!=dict):
             data=data.dict()
         data['mobilenumber'] = str(data['mobilenumber'])
-        mobileNumber = data['mobilenumber']
         password = data['password']
         try :
             result = db.collection("Login").document(mobileNumber).get()
