@@ -87,10 +87,10 @@ Function : login
 Methods : GET
 Description: checks the data in the firebase and return a response with jwt-token if valid user 
 '''
-@api_view(['GET'])
+@api_view(['POST'])
 def login(request):
     
-    if request.method == 'GET':
+    if request.method == 'POST':
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
