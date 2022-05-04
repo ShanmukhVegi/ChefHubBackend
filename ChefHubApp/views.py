@@ -122,7 +122,7 @@ Description: sends a 6-digit message to the mobilenumber and responds with otp
 @api_view(['POST'])
 def generateOtp(request):
 
-    if request.method == 'GET':
+    if request.method == 'POST':
         data = request.data
         if(type(data)!=dict):
             data=data.dict()
