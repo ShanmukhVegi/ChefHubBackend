@@ -116,10 +116,10 @@ def login(request):
 
 '''
 Function : generateOtp
-Methods : GET
+Methods : POST
 Description: sends a 6-digit message to the mobilenumber and responds with otp 
 '''
-@api_view(['GET'])
+@api_view(['POST'])
 def generateOtp(request):
 
     if request.method == 'GET':
